@@ -1,4 +1,6 @@
 public enum Menu {
     FCFS,
-    SJF
+    SJF,
+    Priority,
+    SRTF,
 }

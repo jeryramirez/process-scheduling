@@ -12,4 +12,4 @@ public class Main {
     }
 }
 
-// SIMULAR DIAGRAMA DE GANTT
+// SIMULAR DIAGRAMA DE GANTT4

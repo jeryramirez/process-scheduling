@@ -6,17 +6,21 @@ public class SchedulingProcess {
         ArrayList<Process> processes = new ArrayList<Process>();
         Scanner scanner = new Scanner(System.in);
 
-        for (int i = 0; i < 3; i++){
-            System.out.print("Ingresa el Tiempo de Llegada para proceso P" + (i+1) + ": ");
-            int arrivingTime = scanner.nextInt();
+        for (int i = 0; i < 4; i++){
+            int arrivingTime = i;
 
-            System.out.print("Ingresa el Tiempo de Rafaga de CPU para proceso P" + (i+1) + ": ");
-            int cpuBurst = scanner.nextInt();
+            System.out.print("Ingresa los datos del proceso No." + (i+1) + "\n");
+            System.out.print("\t - Ráfaga de CPU: ");
+            int cpuBurst = Math.round(scanner.nextFloat());
 
+            System.out.print("\t - Prioridad: ");
+            int priority = Math.round(scanner.nextFloat());
+//            System.out.print("Priority: " + priority);
             Process newProcess = new Process(
             "P" + (i+1),
                 arrivingTime,
-                cpuBurst
+                cpuBurst,
+                priority
             );
 
             processes.add(newProcess);
@@ -28,7 +32,7 @@ public class SchedulingProcess {
 
     public static void chooseAnAlgorithms(ArrayList<Process> processes){
 
-        String[] algorithms = { "FCFS", "SJF"};
+        String[] algorithms = { "FCFS", "SJF", "Priority", "SRTF"};
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Selecciona un algolitmo de la lista: \n");
@@ -42,7 +46,13 @@ public class SchedulingProcess {
                 SchedulingAlgorithms.firstComeFirstServed(processes);
                 break;
             case SJF:
+                SchedulingAlgorithms.shortestJobFirst(processes);
                 break;
+            case Priority:
+                SchedulingAlgorithms.prioritySchedule(processes);
+                break;
+            case SRTF:
+                SchedulingAlgorithms.shortestRemainingTimeFirst(processes);
         }
     }
 }
