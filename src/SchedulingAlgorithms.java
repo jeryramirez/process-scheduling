@@ -6,123 +6,88 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SchedulingAlgorithms {
 
-    static StringBuilder line = new StringBuilder();
-    static AtomicInteger totalRafagaCPU = new AtomicInteger();
-    static AtomicInteger lastRafaga = new AtomicInteger();
-    static ArrayList<String> processList = new ArrayList<String>();
+    private final ArrayList<Process> processes;
+    private Process currentProcess;
 
-    static ArrayList<LastProcess> processesListHistory = new ArrayList<LastProcess>();
-
-    static AtomicInteger barsQunatity = new AtomicInteger();
-    static Process currentProcess;
-
-    static LastProcess lastProcess;
-    public static void firstComeFirstServed(ArrayList<Process> processes){
-        processes.sort(Comparator.comparingInt(process -> process._arrivingTime));
-
-        StringBuilder line = new StringBuilder();
-        StringBuilder timeline = new StringBuilder("\t" + 0);
-        AtomicInteger totalRafagaCPU = new AtomicInteger();
-        processes.forEach( ((process) -> {
-            line.append(process._name + addTabs(totalRafagaCPU.get() + 1) + addBars(process._cpuBurst));
-            totalRafagaCPU.addAndGet(process._cpuBurst);
-            timeline.append(addTabs(process._cpuBurst) + totalRafagaCPU.get());
-            System.out.println(line.toString());
-            line.setLength(0);
-        }));
-        System.out.println(timeline.toString());
-        SchedulingProcess.chooseAnAlgorithms(processes);
+    SchedulingAlgorithms(ArrayList<Process> process){
+        this.processes = process;
+        this.currentProcess = processes.get(0);
     }
-    public static void shortestJobFirst(ArrayList<Process> processes){
-        processes.sort(Comparator.comparingInt(process -> process._cpuBurst));
+    private final GanttChart ganttChart = new GanttChart();
 
-        StringBuilder line = new StringBuilder();
-        StringBuilder timeline = new StringBuilder("\t" + 0);
-        AtomicInteger totalRafagaCPU = new AtomicInteger();
-        processes.forEach( ((process) -> {
-            line.append(process._name + addTabs(totalRafagaCPU.get() + 1) + addBars(process._cpuBurst));
-            totalRafagaCPU.addAndGet(process._cpuBurst);
-            timeline.append(addTabs(process._cpuBurst) + totalRafagaCPU.get());
-            System.out.println(line.toString());
-            line.setLength(0);
-        }));
-        System.out.println(timeline.toString());
-        SchedulingProcess.chooseAnAlgorithms(processes);
+    private final ArrayList<String> processList = new ArrayList<String>();
+
+    public void firstComeFirstServed(){
+        this.processes.sort(Comparator.comparingInt(process -> process._arrivingTime));
+
+        this.ganttChart.print(processes);
+
+        SchedulingProcess.chooseAnAlgorithms(this.processes);
+    }
+    public void shortestJobFirst(){
+        this.processes.sort(Comparator.comparingInt(process -> process._cpuBurst));
+
+        this.ganttChart.print(processes);
+
+        SchedulingProcess.chooseAnAlgorithms(this.processes);
 
     }
 
-    public static void prioritySchedule(ArrayList<Process> processes){
-        processes.sort(Comparator.comparingInt(process -> process._priority));
+    public void prioritySchedule(){
+        this.processes.sort(Comparator.comparingInt(process -> process._priority));
 
-        StringBuilder line = new StringBuilder();
-        StringBuilder timeline = new StringBuilder("\t" + 0);
-        AtomicInteger totalRafagaCPU = new AtomicInteger();
-        processes.forEach( ((process) -> {
-//            System.out.println(process._name);
+        this.ganttChart.print(processes);
 
-            line.append(process._name + addTabs(totalRafagaCPU.get() + 1) + addBars(process._cpuBurst));
-            totalRafagaCPU.addAndGet(process._cpuBurst);
-            timeline.append(addTabs(process._cpuBurst) + totalRafagaCPU.get());
-            System.out.println(line.toString());
-            line.setLength(0);
-        }));
-        System.out.println(timeline.toString());
-        SchedulingProcess.chooseAnAlgorithms(processes);
+        SchedulingProcess.chooseAnAlgorithms(this.processes);
 
     }
 
-    public static void shortestRemainingTimeFirst(ArrayList<Process> processes){
-        ArrayList<Process> processesCloned = new ArrayList<Process> (processes.size());
+    public void shortestRemainingTimeFirst(){
+        ArrayList<Process> processesCloned = new ArrayList<Process> (this.processes.size());
 
-        for(Process pro: processes){
+        for(Process pro: this.processes){
             processesCloned.add(new Process(pro._name, pro._arrivingTime, pro._cpuBurst,pro._priority));
         }
 
         processesCloned.sort(Comparator.comparingInt(process -> process._arrivingTime));
 
-        iterateProcesses(processesCloned);
-        totalRafagaCPU.set(0);
-        lastRafaga.set(0);
-        line.setLength(0);
-        barsQunatity.set(0);
-        SchedulingProcess.chooseAnAlgorithms(processes);
+        this.iterateProcesses(processesCloned, this.ganttChart);
+
+        SchedulingProcess.chooseAnAlgorithms(this.processes);
     }
-    public static void iterateProcesses(ArrayList<Process> processes){
-        currentProcess = processes.get(0);
-        if(processList.isEmpty()) processList.add(currentProcess._name);
-        int processListSize = processList.size();
+    private void iterateProcesses(ArrayList<Process> processes, GanttChart gantChart){
+        this.currentProcess = processes.get(0);
+        if(this.processList.isEmpty()) this.processList.add(this.currentProcess._name);
+        int processListSize = this.processList.size();
 
-        if(processList.get(processListSize - 1) == currentProcess._name){
-            barsQunatity.addAndGet(1);
-            if(processList.size() == 1) lastRafaga.addAndGet(1);
-            currentProcess._cpuBurst --;
-
+        if(this.processList.get(processListSize - 1) == this.currentProcess._name){
+            if(this.processList.size() == 1) gantChart.lastRafaga.addAndGet(1);
         } else {
+            gantChart.line.append(this.processList.get(processListSize - 1) + addTabs(gantChart.lastRafaga.get() ) + addBars(gantChart.barsQunatity.get()));
+            gantChart.lastRafaga.addAndGet(gantChart.barsQunatity.get());
+            gantChart.barsQunatity.getAndSet(0);
 
-            line.append(processList.get(processListSize - 1) + addTabs(lastRafaga.get() ) + addBars(barsQunatity.get()));
-            lastRafaga.addAndGet(barsQunatity.get());
-            barsQunatity.getAndSet(0);
-            currentProcess._cpuBurst --;
-            barsQunatity.addAndGet(1);
-            System.out.println(line.toString());
+            System.out.println(gantChart.line.toString());
 
-            line.setLength(0);
+            gantChart.line.setLength(0);
         }
+        this.currentProcess._cpuBurst --;
+        gantChart.barsQunatity.addAndGet(1);
 
-        if(processes.size() == 1 && currentProcess._cpuBurst == 0){
+        if(processes.size() == 1 && this.currentProcess._cpuBurst == 0){
 
-            line.append(processList.get(processListSize - 1) + addTabs(lastRafaga.get()  ) + addBars(barsQunatity.get()));
-            System.out.println(line.toString());
+            gantChart.line.append(this.processList.get(processListSize - 1) + addTabs(gantChart.lastRafaga.get()  ) + addBars(gantChart.barsQunatity.get()));
+            System.out.println(gantChart.line.toString());
             if(processes.isEmpty()) return;
         }
-        totalRafagaCPU.addAndGet(1);
+        gantChart.totalRafagaCPU.addAndGet(1);
 
         processes.removeIf( p -> p._cpuBurst == 0 );
         if(processes.isEmpty()) return;
         processes.sort(Comparator.comparingInt(process1 -> process1._cpuBurst)); // reordenar la lista
         processList.add(currentProcess._name); // agregar nombre del proceso al final de la lista (fines de compraracion
 
-        iterateProcesses(processes); // iterar de nuevo
+        iterateProcesses(processes, gantChart); // iterar de nuevo
     }
     public static void addTimeLine(){
 

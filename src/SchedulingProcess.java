@@ -32,6 +32,8 @@ public class SchedulingProcess {
 
     public static void chooseAnAlgorithms(ArrayList<Process> processes){
 
+        SchedulingAlgorithms schedulingAlgorithms = new SchedulingAlgorithms(processes);
+
         String[] algorithms = { "FCFS", "SJF", "Priority", "SRTF"};
         Scanner scanner = new Scanner(System.in);
 
@@ -43,16 +45,16 @@ public class SchedulingProcess {
         Menu menu = Menu.valueOf(algorithms[option-1]);
         switch (menu){
             case FCFS:
-                SchedulingAlgorithms.firstComeFirstServed(processes);
+                schedulingAlgorithms.firstComeFirstServed();
                 break;
             case SJF:
-                SchedulingAlgorithms.shortestJobFirst(processes);
+                schedulingAlgorithms.shortestJobFirst();
                 break;
             case Priority:
-                SchedulingAlgorithms.prioritySchedule(processes);
+                schedulingAlgorithms.prioritySchedule();
                 break;
             case SRTF:
-                SchedulingAlgorithms.shortestRemainingTimeFirst(processes);
+                schedulingAlgorithms.shortestRemainingTimeFirst();
         }
     }
 }
