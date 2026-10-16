@@ -15,7 +15,7 @@ public class SchedulingProcess {
 
             System.out.print("\t - Prioridad: ");
             int priority = Math.round(scanner.nextFloat());
-//            System.out.print("Priority: " + priority);
+
             Process newProcess = new Process(
             "P" + (i+1),
                 arrivingTime,
@@ -32,7 +32,9 @@ public class SchedulingProcess {
 
     public static void chooseAnAlgorithms(ArrayList<Process> processes){
 
-        String[] algorithms = { "FCFS", "SJF", "Priority", "SRTF"};
+        SchedulingAlgorithms schedulingAlgorithms = new SchedulingAlgorithms(processes);
+
+        String[] algorithms = { "FCFS", "SJF", "Priority", "SRTF", "RR"};
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Selecciona un algolitmo de la lista: \n");
@@ -43,16 +45,18 @@ public class SchedulingProcess {
         Menu menu = Menu.valueOf(algorithms[option-1]);
         switch (menu){
             case FCFS:
-                SchedulingAlgorithms.firstComeFirstServed(processes);
+                schedulingAlgorithms.firstComeFirstServed();
                 break;
             case SJF:
-                SchedulingAlgorithms.shortestJobFirst(processes);
+                schedulingAlgorithms.shortestJobFirst();
                 break;
             case Priority:
-                SchedulingAlgorithms.prioritySchedule(processes);
+                schedulingAlgorithms.prioritySchedule();
                 break;
             case SRTF:
-                SchedulingAlgorithms.shortestRemainingTimeFirst(processes);
+                schedulingAlgorithms.shortestRemainingTimeFirst();
+            case RR:
+                schedulingAlgorithms.roundRobin();
         }
     }
 }

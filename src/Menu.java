@@ -3,4 +3,5 @@ public enum Menu {
     SJF,
     Priority,
     SRTF,
+    RR,
 }
