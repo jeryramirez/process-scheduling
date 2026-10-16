@@ -6,7 +6,7 @@ public class GanttChart {
     public AtomicInteger totalRafagaCPU = new AtomicInteger();
     public AtomicInteger lastRafaga = new AtomicInteger();
     public AtomicInteger barsQunatity = new AtomicInteger();
-    private StringBuilder timeline = new StringBuilder("\t" + 0);
+    public StringBuilder timeline = new StringBuilder("\t" + 0);
 
     public void print(ArrayList<Process> processes){
         processes.forEach( ((process) -> {
